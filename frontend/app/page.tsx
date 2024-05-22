@@ -1,31 +1,45 @@
-import { signIn, signOut, useSession } from 'next-auth/react';
+"use client";
+import { signOut, useSession } from "next-auth/react";
+import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
+  const handleLogout = () => {
+    signOut();
+  };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      {!session ? (
-        <>
-          <h1 className="text-3xl font-bold">You are not signed in</h1>
-          <button
-            onClick={() => signIn()}
-            className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded"
-          >
-            Sign in
-          </button>
-        </>
-      ) : (
-        <>
-          <h1 className="text-3xl font-bold">Welcome, {session.user?.email}</h1>
-          <button
-            onClick={() => signOut()}
-            className="ml-4 px-4 py-2 bg-red-600 text-white rounded"
-          >
-            Sign out
-          </button>
-        </>
-      )}
+    <div className={styles.homeContainer}>
+      <div className={styles.wrapper}>
+        {status !== "authenticated" ? (
+          <>
+            <h2 className={styles.heading}>Welcome to our website</h2>
+            <hr className={styles.hrLine} />
+            <p className={styles.paragraph}>
+              Please sign in or create an account to continue.
+            </p>
+            <button className={styles.btn} onClick={handleLogin}>
+              Sign In / Sign Up
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 className={styles.heading}>Welcome, {session.user.name}</h2>
+            <hr className={styles.hrLine} />
+            <p className={styles.paragraph}>Email: {session.user.email}</p>
+            <button className={styles.btn} onClick={handleLogout}>
+              Sign out
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
